@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Status Report Diário - Projeto NFSe Rotina Programável</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --primary: #1d4ed8;
+      --primary-soft: #dbeafe;
+      --green: #16a34a;
+      --amber: #d97706;
+      --red: #dc2626;
+      --purple: #7c3aed;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 65%, #60a5fa 100%);
+      color: white;
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+    .hero h1 { margin: 0 0 8px; font-size: 32px; }
+    .hero p { margin: 6px 0; opacity: .92; }
+    .chip {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.16);
+      margin: 6px 8px 0 0;
+      font-size: 13px;
+    }
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+    .filters {
+      grid-template-columns: repeat(6, minmax(140px, 1fr));
+      align-items: end;
+    }
+    .cards {
+      grid-template-columns: repeat(5, minmax(180px, 1fr));
+    }
+    .chart-grid {
+      grid-template-columns: repeat(2, minmax(320px, 1fr));
+    }
+    .municipio-grid {
+      grid-template-columns: repeat(3, minmax(260px, 1fr));
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(229,231,235,.9);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    select, input, textarea, button {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      padding: 11px 12px;
+      font-size: 14px;
+      background: white;
+    }
+    textarea {
+      min-height: 220px;
+      font-family: Consolas, monospace;
+      resize: vertical;
+    }
+    button {
+      cursor: pointer;
+      border: 0;
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+    }
+    button.secondary {
+      background: #0f172a;
+    }
+    button.light {
+      background: white;
+      border: 1px solid #d1d5db;
+      color: var(--text);
+    }
+    .kpi-title {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .kpi-value {
+      font-size: 34px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .kpi-foot {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 28px 0 14px;
+    }
+    .municipio-card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+    .mini-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .mini-box {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .mini-box strong {
+      display: block;
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .ok { background: #dcfce7; color: #166534; }
+    .teste { background: #fef3c7; color: #92400e; }
+    .nao { background: #fee2e2; color: #991b1b; }
+    .table-wrap {
+      overflow: auto;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      white-space: nowrap;
+    }
+    th {
+      background: #eff6ff;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tr:hover td {
+      background: #f8fafc;
+    }
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .accordion {
+      margin-top: 14px;
+    }
+    details {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 12px 16px;
+    }
+    summary {
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 16px;
+    }
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    @media (max-width: 1100px) {
+      .filters, .cards, .chart-grid, .municipio-grid, .toolbar {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 720px) {
+      .filters, .cards, .chart-grid, .municipio-grid, .toolbar {
+        grid-template-columns: 1fr;
+      }
+      .hero h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>Status Report Diário — Projeto de Emissão de NFSe / Rotina Programável</h1>
+      <p>Painel interativo para acompanhamento diário, com filtros por cenário, município, NBS, status e prazo de entrega.</p>
+      <p>
+        <span class="chip">Formato atualizável</span>
+        <span class="chip">Visão por cenário</span>
+        <span class="chip">Gráficos para reunião diária</span>
+        <span class="chip">Tabela filtrável</span>
+      </p>
+    </section>
+
+    <section class="card">
+      <div class="grid filters">
+        <div>
+          <label>Município</label>
+          <select id="fMunicipio"></select>
+        </div>
+        <div>
+          <label>Cenário</label>
+          <select id="fCenario"></select>
+        </div>
+        <div>
+          <label>Status da atividade</label>
+          <select id="fStatus"></select>
+        </div>
+        <div>
+          <label>NBS</label>
+          <select id="fNBS"></select>
+        </div>
+        <div>
+          <label>Previsão inicial</label>
+          <input type="date" id="fDataIni" />
+        </div>
+        <div>
+          <label>Previsão final</label>
+          <input type="date" id="fDataFim" />
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button id="btnLimpar">Limpar filtros</button>
+        <button class="secondary" id="btnExportarCsv">Exportar visão filtrada (CSV)</button>
+        <button class="light" id="btnHoje">Filtrar atividades até hoje</button>
+      </div>
+      <p class="footer-note">Dica: use este painel na reunião diária para acompanhar atividades em atraso, em teste, prontas para go live e o recorte por município/cenário.</p>
+    </section>
+
+    <div class="section-title">Indicadores executivos</div>
+    <section class="grid cards">
+      <div class="card">
+        <div class="kpi-title">Atividades NBS</div>
+        <div class="kpi-value" id="kpiTotal">0</div>
+        <div class="kpi-foot">Total de registros no filtro atual</div>
+      </div>
+      <div class="card">
+        <div class="kpi-title">Municípios</div>
+        <div class="kpi-value" id="kpiMunicipios">0</div>
+        <div class="kpi-foot">Cobertura territorial</div>
+      </div>
+      <div class="card">
+        <div class="kpi-title">Cenários</div>
+        <div class="kpi-value" id="kpiCenarios">0</div>
+        <div class="kpi-foot">Soma dos cenários visíveis</div>
+      </div>
+      <div class="card">
+        <div class="kpi-title">Em atraso</div>
+        <div class="kpi-value" id="kpiAtraso">0</div>
+        <div class="kpi-foot">Previsão menor que hoje e ainda não concluído</div>
+      </div>
+      <div class="card">
+        <div class="kpi-title">Prontos / Em teste</div>
+        <div class="kpi-value" id="kpiProntosTeste">0</div>
+        <div class="kpi-foot">Atividades em fase final</div>
+      </div>
+    </section>
+
+    <div class="section-title">Gráficos para status report</div>
+    <section class="grid chart-grid">
+      <div class="card">
+        <canvas id="chartStatus" height="120"></canvas>
+      </div>
+      <div class="card">
+        <canvas id="chartMunicipio" height="120"></canvas>
+      </div>
+      <div class="card">
+        <canvas id="chartCenarios" height="120"></canvas>
+      </div>
+      <div class="card">
+        <canvas id="chartPrazo" height="120"></canvas>
+      </div>
+    </section>
+
+    <div class="section-title">Resumo por município</div>
+    <section class="grid municipio-grid" id="municipioCards"></section>
+
+    <div class="section-title">Detalhamento das atividades</div>
+    <section class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Município</th>
+              <th>Cenários</th>
+              <th>NBS</th>
+              <th>Status</th>
+              <th>Previsão</th>
+              <th>Go Live</th>
+              <th>Dias até previsão</th>
+              <th>Dias até go live</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <p class="footer-note" id="tableInfo"></p>
+    </section>
+
+    <div class="section-title">Atualização do relatório</div>
+    <div class="accordion">
+      <details>
+        <summary>Editar os dados manualmente neste HTML</summary>
+        <p class="hint">
+          Este painel já vem com os dados carregados. Para atualizar no futuro, você pode substituir o conteúdo abaixo por um JSON novo
+          no mesmo formato e clicar em <strong>Aplicar novos dados</strong>. Isso permite reaproveitar o HTML para o status report diário.
+        </p>
+        <label>Base em JSON</label>
+        <textarea id="jsonEditor"></textarea>
+        <div class="toolbar">
+          <button id="btnAplicarJson">Aplicar novos dados</button>
+          <button class="secondary" id="btnBaixarModelo">Baixar modelo JSON</button>
+          <button class="light" id="btnRestaurar">Restaurar base original</button>
+        </div>
+      </details>
+    </div>
+  </div>
+
+<script>
+const ORIGINAL_DATA = [{"MUNICIPIO": "SÃO PAULO", "CENARIOS": 4, "NBS": "1.0906.11.00", "SITUACAO": "EMISSÃO OK", "PREVISAO": "2026-03-20", "GO_LIVE": "2026-03-24", "dias_para_previsao": -3, "dias_para_go_live": 1}, {"MUNICIPIO": "SÃO PAULO", "CENARIOS": 4, "NBS": "1.0910.20.00", "SITUACAO": "EM TESTE", "PREVISAO": "2026-03-23", "GO_LIVE": "2026-03-24", "dias_para_previsao": 0, "dias_para_go_live": 1}, {"MUNICIPIO": "SÃO PAULO", "CENARIOS": 4, "NBS": "1.1401.39.00", "SITUACAO": "EM TESTE", "PREVISAO": "2026-03-23", "GO_LIVE": "2026-03-24", "dias_para_previsao": 0, "dias_para_go_live": 1}, {"MUNICIPIO": "SÃO PAULO", "CENARIOS": 4, "NBS": "1.0905.11.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-23", "GO_LIVE": "2026-03-24", "dias_para_previsao": 0, "dias_para_go_live": 1}, {"MUNICIPIO": "RIO DE JANEIRO", "CENARIOS": 3, "NBS": "1.0906.11.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-25", "GO_LIVE": "2026-03-26", "dias_para_previsao": 2, "dias_para_go_live": 3}, {"MUNICIPIO": "RIO DE JANEIRO", "CENARIOS": 3, "NBS": "1.0910.20.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-25", "GO_LIVE": "2026-03-26", "dias_para_previsao": 2, "dias_para_go_live": 3}, {"MUNICIPIO": "RIO DE JANEIRO", "CENARIOS": 3, "NBS": "1.1401.39.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-25", "GO_LIVE": "2026-03-26", "dias_para_previsao": 2, "dias_para_go_live": 3}, {"MUNICIPIO": "FORTALEZA", "CENARIOS": 3, "NBS": "1.0906.11.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-26", "GO_LIVE": "2026-03-27", "dias_para_previsao": 3, "dias_para_go_live": 4}, {"MUNICIPIO": "FORTALEZA", "CENARIOS": 3, "NBS": "1.0910.20.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-26", "GO_LIVE": "2026-03-27", "dias_para_previsao": 3, "dias_para_go_live": 4}, {"MUNICIPIO": "FORTALEZA", "CENARIOS": 3, "NBS": "1.1401.39.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-26", "GO_LIVE": "2026-03-27", "dias_para_previsao": 3, "dias_para_go_live": 4}];
+let data = JSON.parse(JSON.stringify(ORIGINAL_DATA));
+let charts = {};
+
+const els = {
+  municipio: document.getElementById('fMunicipio'),
+  cenario: document.getElementById('fCenario'),
+  status: document.getElementById('fStatus'),
+  nbs: document.getElementById('fNBS'),
+  dataIni: document.getElementById('fDataIni'),
+  dataFim: document.getElementById('fDataFim'),
+  tbody: document.getElementById('tbody'),
+  tableInfo: document.getElementById('tableInfo'),
+  jsonEditor: document.getElementById('jsonEditor'),
+};
+
+els.jsonEditor.value = JSON.stringify(ORIGINAL_DATA, null, 2);
+
+function fmtDate(v) {
+  if (!v) return '-';
+  const d = new Date(v + 'T00:00:00');
+  return d.toLocaleDateString('pt-BR');
+}
+
+function daysBetween(dateStr) {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const d = new Date(dateStr + 'T00:00:00');
+  return Math.round((d - today) / 86400000);
+}
+
+function statusClass(status) {
+  if (status === 'EMISSÃO OK') return 'status ok';
+  if (status === 'EM TESTE') return 'status teste';
+  return 'status nao';
+}
+
+function unique(arr) {
+  return [...new Set(arr.filter(v => v !== undefined && v !== null && v !== ''))];
+}
+
+function fillSelect(select, values, labelAll='Todos') {
+  const current = select.value;
+  select.innerHTML = '';
+  const optAll = document.createElement('option');
+  optAll.value = '';
+  optAll.textContent = labelAll;
+  select.appendChild(optAll);
+  values.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = String(v);
+    opt.textContent = String(v);
+    select.appendChild(opt);
+  });
+  if ([...select.options].some(o => o.value === current)) select.value = current;
+}
+
+function buildFilters() {
+  fillSelect(els.municipio, unique(data.map(d => d.MUNICIPIO)).sort(), 'Todos os municípios');
+  fillSelect(els.cenario, unique(data.map(d => d.CENARIOS)).sort((a,b) => a-b), 'Todos os cenários');
+  fillSelect(els.status, unique(data.map(d => d.SITUACAO)).sort(), 'Todos os status');
+  fillSelect(els.nbs, unique(data.map(d => d.NBS)).sort(), 'Todos os NBS');
+}
+
+function getFilteredData() {
+  return data.filter(d => {
+    const okMunicipio = !els.municipio.value || d.MUNICIPIO === els.municipio.value;
+    const okCenario = !els.cenario.value || String(d.CENARIOS) === els.cenario.value;
+    const okStatus = !els.status.value || d.SITUACAO === els.status.value;
+    const okNbs = !els.nbs.value || d.NBS === els.nbs.value;
+    const okDataIni = !els.dataIni.value || d.PREVISAO >= els.dataIni.value;
+    const okDataFim = !els.dataFim.value || d.PREVISAO <= els.dataFim.value;
+    return okMunicipio && okCenario && okStatus && okNbs && okDataIni && okDataFim;
+  }).map(d => ({
+    ...d,
+    dias_previsao_atual: daysBetween(d.PREVISAO),
+    dias_go_live_atual: daysBetween(d.GO_LIVE)
+  }));
+}
+
+function updateKPIs(rows) {
+  const municipios = unique(rows.map(r => r.MUNICIPIO)).length;
+  const cenarios = rows.reduce((acc, row) => {
+    acc[row.MUNICIPIO] = row.CENARIOS;
+    return acc;
+  }, {});
+  const totalCenarios = Object.values(cenarios).reduce((a,b) => a + Number(b || 0), 0);
+  const atraso = rows.filter(r => r.dias_previsao_atual < 0 && r.SITUACAO !== 'EMISSÃO OK').length;
+  const prontosTeste = rows.filter(r => ['EMISSÃO OK','EM TESTE'].includes(r.SITUACAO)).length;
+  document.getElementById('kpiTotal').textContent = rows.length;
+  document.getElementById('kpiMunicipios').textContent = municipios;
+  document.getElementById('kpiCenarios').textContent = totalCenarios;
+  document.getElementById('kpiAtraso').textContent = atraso;
+  document.getElementById('kpiProntosTeste').textContent = prontosTeste;
+}
+
+function destroyCharts() {
+  Object.values(charts).forEach(ch => ch && ch.destroy && ch.destroy());
+  charts = {};
+}
+
+function countBy(rows, key) {
+  const map = {};
+  rows.forEach(r => map[r[key]] = (map[r[key]] || 0) + 1);
+  return map;
+}
+
+function renderCharts(rows) {
+  destroyCharts();
+
+  const statusMap = countBy(rows, 'SITUACAO');
+  charts.status = new Chart(document.getElementById('chartStatus'), {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(statusMap),
+      datasets: [{ data: Object.values(statusMap) }]
+    },
+    options: {
+      plugins: {
+        title: { display: true, text: 'Distribuição por status' },
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+
+  const municipioMap = countBy(rows, 'MUNICIPIO');
+  charts.municipio = new Chart(document.getElementById('chartMunicipio'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(municipioMap),
+      datasets: [{ label: 'Atividades NBS', data: Object.values(municipioMap) }]
+    },
+    options: {
+      plugins: { title: { display: true, text: 'Atividades por município' } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+  });
+
+  const cenariosMap = {};
+  rows.forEach(r => cenariosMap[r.MUNICIPIO] = Number(r.CENARIOS));
+  charts.cenarios = new Chart(document.getElementById('chartCenarios'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(cenariosMap),
+      datasets: [{ label: 'Qtd. de cenários', data: Object.values(cenariosMap) }]
+    },
+    options: {
+      plugins: { title: { display: true, text: 'Cenários por município' } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+  });
+
+  const prazoMap = {};
+  rows.forEach(r => {
+    prazoMap[r.PREVISAO] = (prazoMap[r.PREVISAO] || 0) + 1;
+  });
+  const labelsPrazo = Object.keys(prazoMap).sort();
+  charts.prazo = new Chart(document.getElementById('chartPrazo'), {
+    type: 'line',
+    data: {
+      labels: labelsPrazo.map(fmtDate),
+      datasets: [{ label: 'Atividades por previsão', data: labelsPrazo.map(k => prazoMap[k]), tension: 0.25 }]
+    },
+    options: {
+      plugins: { title: { display: true, text: 'Curva de prazo de entrega (previsão)' } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+  });
+}
+
+function renderMunicipioCards(rows) {
+  const container = document.getElementById('municipioCards');
+  container.innerHTML = '';
+  const municipios = unique(rows.map(r => r.MUNICIPIO));
+  municipios.forEach(m => {
+    const subset = rows.filter(r => r.MUNICIPIO === m);
+    const cenarios = subset[0]?.CENARIOS || 0;
+    const ok = subset.filter(r => r.SITUACAO === 'EMISSÃO OK').length;
+    const teste = subset.filter(r => r.SITUACAO === 'EM TESTE').length;
+    const nao = subset.filter(r => r.SITUACAO === 'NÃO INICIADO').length;
+    const proxima = subset
+      .map(r => r.PREVISAO)
+      .sort()[0];
+    const div = document.createElement('div');
+    div.className = 'card municipio-card';
+    div.innerHTML = `
+      <h3>${m}</h3>
+      <div class="hint">Cenários planejados: <strong>${cenarios}</strong></div>
+      <div class="hint">Próxima previsão: <strong>${fmtDate(proxima)}</strong></div>
+      <div class="mini-metrics">
+        <div class="mini-box"><strong>${subset.length}</strong> NBS mapeados</div>
+        <div class="mini-box"><strong>${ok}</strong> emissão ok</div>
+        <div class="mini-box"><strong>${teste}</strong> em teste</div>
+        <div class="mini-box"><strong>${nao}</strong> não iniciado</div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function renderTable(rows) {
+  els.tbody.innerHTML = '';
+  rows
+    .slice()
+    .sort((a,b) => a.MUNICIPIO.localeCompare(b.MUNICIPIO) || a.PREVISAO.localeCompare(b.PREVISAO) || a.NBS.localeCompare(b.NBS))
+    .forEach(r => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${r.MUNICIPIO}</td>
+        <td>${r.CENARIOS}</td>
+        <td>${r.NBS}</td>
+        <td><span class="${statusClass(r.SITUACAO)}">${r.SITUACAO}</span></td>
+        <td>${fmtDate(r.PREVISAO)}</td>
+        <td>${fmtDate(r.GO_LIVE)}</td>
+        <td>${r.dias_previsao_atual}</td>
+        <td>${r.dias_go_live_atual}</td>
+      `;
+      els.tbody.appendChild(tr);
+    });
+  els.tableInfo.textContent = `Exibindo ${rows.length} registro(s) no filtro atual.`;
+}
+
+function render() {
+  const rows = getFilteredData();
+  updateKPIs(rows);
+  renderCharts(rows);
+  renderMunicipioCards(rows);
+  renderTable(rows);
+}
+
+function download(filename, text, type='text/plain;charset=utf-8') {
+  const blob = new Blob([text], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportCsv(rows) {
+  const header = ['MUNICIPIO','CENARIOS','NBS','SITUACAO','PREVISAO','GO_LIVE','DIAS_PARA_PREVISAO','DIAS_PARA_GO_LIVE'];
+  const lines = [header.join(';')];
+  rows.forEach(r => {
+    lines.push([
+      r.MUNICIPIO, r.CENARIOS, r.NBS, r.SITUACAO, r.PREVISAO, r.GO_LIVE, r.dias_previsao_atual, r.dias_go_live_atual
+    ].map(v => `"${String(v).replaceAll('"','""')}"`).join(';'));
+  });
+  download('status_report_nfse_filtrado.csv', lines.join('\n'), 'text/csv;charset=utf-8');
+}
+
+['change','input'].forEach(evt => {
+  [els.municipio, els.cenario, els.status, els.nbs, els.dataIni, els.dataFim].forEach(el => el.addEventListener(evt, render));
+});
+
+document.getElementById('btnLimpar').addEventListener('click', () => {
+  els.municipio.value = '';
+  els.cenario.value = '';
+  els.status.value = '';
+  els.nbs.value = '';
+  els.dataIni.value = '';
+  els.dataFim.value = '';
+  render();
+});
+
+document.getElementById('btnHoje').addEventListener('click', () => {
+  const today = new Date();
+  const iso = today.toISOString().slice(0,10);
+  els.dataIni.value = '';
+  els.dataFim.value = iso;
+  render();
+});
+
+document.getElementById('btnExportarCsv').addEventListener('click', () => exportCsv(getFilteredData()));
+
+document.getElementById('btnAplicarJson').addEventListener('click', () => {
+  try {
+    const parsed = JSON.parse(els.jsonEditor.value);
+    if (!Array.isArray(parsed)) throw new Error('O JSON precisa ser uma lista de registros.');
+    data = parsed;
+    buildFilters();
+    render();
+    alert('Dados atualizados com sucesso.');
+  } catch (e) {
+    alert('Não foi possível aplicar os dados. Verifique o JSON.\n\n' + e.message);
+  }
+});
+
+document.getElementById('btnBaixarModelo').addEventListener('click', () => {
+  download('modelo_dados_nfse.json', JSON.stringify(data, null, 2), 'application/json;charset=utf-8');
+});
+
+document.getElementById('btnRestaurar').addEventListener('click', () => {
+  data = JSON.parse(JSON.stringify(ORIGINAL_DATA));
+  els.jsonEditor.value = JSON.stringify(ORIGINAL_DATA, null, 2);
+  buildFilters();
+  render();
+});
+
+buildFilters();
+render();
+</script>
+</body>
+</html>
