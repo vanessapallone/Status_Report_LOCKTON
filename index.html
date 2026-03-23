@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Status Report Diário - Projeto NFSe Rotina Programável</title>
+  <title>Status Report Diário Lockton - Projeto NFSe Rotina Programável</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -240,7 +240,7 @@
 <body>
   <div class="container">
     <section class="hero">
-      <h1>Status Report Diário — Projeto de Emissão de NFSe / Rotina Programável</h1>
+      <h1>Status Report Diário Lockton — Projeto de Emissão de NFSe / Rotina Programável</h1>
       <p>Painel interativo para acompanhamento diário, com filtros por cenário, município, NBS, status e prazo de entrega.</p>
       <p>
         <span class="chip">Formato atualizável</span>
@@ -376,7 +376,7 @@
   </div>
 
 <script>
-const ORIGINAL_DATA = [{"MUNICIPIO": "SÃO PAULO", "CENARIOS": 4, "NBS": "1.0906.11.00", "SITUACAO": "EMISSÃO OK", "PREVISAO": "2026-03-20", "GO_LIVE": "2026-03-24", "dias_para_previsao": -3, "dias_para_go_live": 1}, {"MUNICIPIO": "SÃO PAULO", "CENARIOS": 4, "NBS": "1.0910.20.00", "SITUACAO": "EM TESTE", "PREVISAO": "2026-03-23", "GO_LIVE": "2026-03-24", "dias_para_previsao": 0, "dias_para_go_live": 1}, {"MUNICIPIO": "SÃO PAULO", "CENARIOS": 4, "NBS": "1.1401.39.00", "SITUACAO": "EM TESTE", "PREVISAO": "2026-03-23", "GO_LIVE": "2026-03-24", "dias_para_previsao": 0, "dias_para_go_live": 1}, {"MUNICIPIO": "SÃO PAULO", "CENARIOS": 4, "NBS": "1.0905.11.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-23", "GO_LIVE": "2026-03-24", "dias_para_previsao": 0, "dias_para_go_live": 1}, {"MUNICIPIO": "RIO DE JANEIRO", "CENARIOS": 3, "NBS": "1.0906.11.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-25", "GO_LIVE": "2026-03-26", "dias_para_previsao": 2, "dias_para_go_live": 3}, {"MUNICIPIO": "RIO DE JANEIRO", "CENARIOS": 3, "NBS": "1.0910.20.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-25", "GO_LIVE": "2026-03-26", "dias_para_previsao": 2, "dias_para_go_live": 3}, {"MUNICIPIO": "RIO DE JANEIRO", "CENARIOS": 3, "NBS": "1.1401.39.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-25", "GO_LIVE": "2026-03-26", "dias_para_previsao": 2, "dias_para_go_live": 3}, {"MUNICIPIO": "FORTALEZA", "CENARIOS": 3, "NBS": "1.0906.11.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-26", "GO_LIVE": "2026-03-27", "dias_para_previsao": 3, "dias_para_go_live": 4}, {"MUNICIPIO": "FORTALEZA", "CENARIOS": 3, "NBS": "1.0910.20.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-26", "GO_LIVE": "2026-03-27", "dias_para_previsao": 3, "dias_para_go_live": 4}, {"MUNICIPIO": "FORTALEZA", "CENARIOS": 3, "NBS": "1.1401.39.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-26", "GO_LIVE": "2026-03-27", "dias_para_previsao": 3, "dias_para_go_live": 4}];
+const ORIGINAL_DATA = [{"MUNICIPIO": "SÃO PAULO", "CENARIOS": 4, "NBS": "1.0906.11.00", "SITUACAO": "EMISSÃO OK", "PREVISAO": "2026-03-23", "GO_LIVE": "2026-03-24", "dias_para_previsao": -3, "dias_para_go_live": 1}, {"MUNICIPIO": "SÃO PAULO", "CENARIOS": 4, "NBS": "1.0910.20.00", "SITUACAO": "EM TESTE", "PREVISAO": "2026-03-23", "GO_LIVE": "2026-03-24", "dias_para_previsao": 0, "dias_para_go_live": 1}, {"MUNICIPIO": "SÃO PAULO", "CENARIOS": 4, "NBS": "1.1401.39.00", "SITUACAO": "EM TESTE", "PREVISAO": "2026-03-23", "GO_LIVE": "2026-03-24", "dias_para_previsao": 0, "dias_para_go_live": 1}, {"MUNICIPIO": "SÃO PAULO", "CENARIOS": 4, "NBS": "1.0905.11.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-23", "GO_LIVE": "2026-03-24", "dias_para_previsao": 0, "dias_para_go_live": 1}, {"MUNICIPIO": "RIO DE JANEIRO", "CENARIOS": 3, "NBS": "1.0906.11.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-25", "GO_LIVE": "2026-03-26", "dias_para_previsao": 2, "dias_para_go_live": 3}, {"MUNICIPIO": "RIO DE JANEIRO", "CENARIOS": 3, "NBS": "1.0910.20.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-25", "GO_LIVE": "2026-03-26", "dias_para_previsao": 2, "dias_para_go_live": 3}, {"MUNICIPIO": "RIO DE JANEIRO", "CENARIOS": 3, "NBS": "1.1401.39.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-25", "GO_LIVE": "2026-03-26", "dias_para_previsao": 2, "dias_para_go_live": 3}, {"MUNICIPIO": "FORTALEZA", "CENARIOS": 3, "NBS": "1.0906.11.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-26", "GO_LIVE": "2026-03-27", "dias_para_previsao": 3, "dias_para_go_live": 4}, {"MUNICIPIO": "FORTALEZA", "CENARIOS": 3, "NBS": "1.0910.20.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-26", "GO_LIVE": "2026-03-27", "dias_para_previsao": 3, "dias_para_go_live": 4}, {"MUNICIPIO": "FORTALEZA", "CENARIOS": 3, "NBS": "1.1401.39.00", "SITUACAO": "NÃO INICIADO", "PREVISAO": "2026-03-26", "GO_LIVE": "2026-03-27", "dias_para_previsao": 3, "dias_para_go_live": 4}];
 let data = JSON.parse(JSON.stringify(ORIGINAL_DATA));
 let charts = {};
 
